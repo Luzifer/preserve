@@ -20,6 +20,7 @@ var (
 		Listen         string `flag:"listen" default:":3000" description:"Port/IP to listen on"`
 		LogLevel       string `flag:"log-level" default:"info" description:"Log level (debug, info, warn, error, fatal)"`
 		StorageDir     string `flag:"storage-dir" default:"./data/" description:"Where to store cached files"`
+		UserAgent      string `flag:"user-agent" default:"" description:"Override user-agent"`
 		VersionAndExit bool   `flag:"version" default:"false" description:"Prints current version and exits"`
 	}{}
 

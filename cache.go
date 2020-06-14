@@ -13,7 +13,16 @@ import (
 func renewCache(url string) (*meta, error) {
 	var cachePath = urlToCachePath(url)
 
-	resp, err := http.Get(url)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to create request")
+	}
+
+	if cfg.UserAgent != "" {
+		req.Header.Set("User-Agent", cfg.UserAgent)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to fetch source file")
 	}
