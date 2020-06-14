@@ -92,7 +92,7 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 
 		metadata, err = renewCache(uri)
 		if err != nil {
-			log.WithError(err).Warn("Unable to refresh file")
+			logger.WithError(err).Warn("Unable to refresh file")
 		}
 	}
 
