@@ -1,9 +1,9 @@
 package main
 
 import (
-	"io"
+	"crypto/sha256"
+	"fmt"
 	"net/http"
-	"os"
 	"path"
 	"time"
 
@@ -11,7 +11,7 @@ import (
 )
 
 func renewCache(url string) (*meta, error) {
-	var cachePath = urlToCachePath(url)
+	cachePath := urlToCachePath(url)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -26,26 +26,13 @@ func renewCache(url string) (*meta, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to fetch source file")
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode > 299 {
 		return nil, errors.Errorf("HTTP status signaled failure: %d", resp.StatusCode)
 	}
 
-	if err = os.MkdirAll(path.Dir(cachePath), 0700); err != nil {
-		return nil, errors.Wrap(err, "Unable to create cache dir")
-	}
-
-	f, err := os.Create(cachePath)
-	if err != nil {
-		return nil, errors.Wrap(err, "Unable to create cache file")
-	}
-	defer f.Close()
-
-	if _, err := io.Copy(f, resp.Body); err != nil {
-		return nil, errors.Wrap(err, "Unable to write cache file")
-	}
-
-	var lm = time.Now()
+	lm := time.Now()
 	if t, err := time.Parse(http.TimeFormat, resp.Header.Get("Last-Modified")); err == nil {
 		lm = t
 	}
@@ -56,5 +43,10 @@ func renewCache(url string) (*meta, error) {
 		LastModified: lm,
 	}
 
-	return metadata, saveMeta(cachePath, *metadata)
+	return metadata, store.StoreFile(cachePath, metadata, resp.Body)
+}
+
+func urlToCachePath(url string) string {
+	h := fmt.Sprintf("%x", sha256.Sum256([]byte(url)))
+	return path.Join(h[0:2], h)
 }

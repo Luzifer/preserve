@@ -1,12 +1,10 @@
 package main
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -17,13 +15,15 @@ import (
 
 var (
 	cfg = struct {
-		Listen         string `flag:"listen" default:":3000" description:"Port/IP to listen on"`
-		LogLevel       string `flag:"log-level" default:"info" description:"Log level (debug, info, warn, error, fatal)"`
-		StorageDir     string `flag:"storage-dir" default:"./data/" description:"Where to store cached files"`
-		UserAgent      string `flag:"user-agent" default:"" description:"Override user-agent"`
-		VersionAndExit bool   `flag:"version" default:"false" description:"Prints current version and exits"`
+		Listen          string `flag:"listen" default:":3000" description:"Port/IP to listen on"`
+		LogLevel        string `flag:"log-level" default:"info" description:"Log level (debug, info, warn, error, fatal)"`
+		StorageDir      string `flag:"storage-dir" default:"./data/" description:"[local] Where to store cached files"`
+		StorageProvider string `flag:"storage-provider" default:"local" description:"Storage providers to use ('list' to print a list)"`
+		UserAgent       string `flag:"user-agent" default:"" description:"Override user-agent"`
+		VersionAndExit  bool   `flag:"version" default:"false" description:"Prints current version and exits"`
 	}{}
 
+	store   storage
 	version = "dev"
 )
 
@@ -46,6 +46,19 @@ func init() {
 }
 
 func main() {
+	switch cfg.StorageProvider {
+	case "list":
+		// Special "provider" to list possible providers
+		fmt.Println("Available Storage Providers: local")
+		return
+
+	case "local":
+		store = newStorageLocal(cfg.StorageDir)
+
+	default:
+		log.Fatalf("Invalid storage provider: %q", cfg.StorageProvider)
+	}
+
 	r := mux.NewRouter()
 	r.PathPrefix("/latest/").HandlerFunc(handleCacheLatest)
 	r.PathPrefix("/").HandlerFunc(handleCacheOnce)
@@ -80,7 +93,7 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 
 	logger.Debug("Received request")
 
-	metadata, err := loadMeta(cachePath)
+	metadata, err := store.LoadMeta(cachePath)
 	if err != nil && !os.IsNotExist(err) {
 		log.WithError(err).Error("Unable to load meta")
 		http.Error(w, "Unable to access entry metadata", http.StatusInternalServerError)
@@ -106,7 +119,7 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 	w.Header().Set("X-Last-Cached", metadata.LastCached.UTC().Format(http.TimeFormat))
 	w.Header().Set("X-Cache", cacheHeader)
 
-	f, err := os.Open(cachePath)
+	f, err := store.GetFile(cachePath)
 	if err != nil {
 		log.WithError(err).Error("Unable to load cached file")
 		http.Error(w, "Unable to access cache entry", http.StatusInternalServerError)
@@ -115,9 +128,4 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 	defer f.Close()
 
 	http.ServeContent(w, r, "", metadata.LastModified, f)
-}
-
-func urlToCachePath(url string) string {
-	h := fmt.Sprintf("%x", sha256.Sum256([]byte(url)))
-	return path.Join(cfg.StorageDir, h[0:2], h)
 }
