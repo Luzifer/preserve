@@ -15,6 +15,7 @@ import (
 
 var (
 	cfg = struct {
+		BucketURI       string `flag:"bucket-uri" default:"" description:"[gcs] Format: gs://bucket/prefix"`
 		Listen          string `flag:"listen" default:":3000" description:"Port/IP to listen on"`
 		LogLevel        string `flag:"log-level" default:"info" description:"Log level (debug, info, warn, error, fatal)"`
 		StorageDir      string `flag:"storage-dir" default:"./data/" description:"[local] Where to store cached files"`
@@ -46,7 +47,14 @@ func init() {
 }
 
 func main() {
+	var err error
+
 	switch cfg.StorageProvider {
+	case "gcs":
+		if store, err = newStorageGCS(cfg.BucketURI); err != nil {
+			log.WithError(err).Fatal("Unable to create GCS storage")
+		}
+
 	case "list":
 		// Special "provider" to list possible providers
 		fmt.Println("Available Storage Providers: local")
