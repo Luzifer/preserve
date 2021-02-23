@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func renewCache(url string) (*meta, error) {
+func renewCache(ctx context.Context, url string) (*meta, error) {
 	cachePath := urlToCachePath(url)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -43,7 +44,7 @@ func renewCache(url string) (*meta, error) {
 		LastModified: lm,
 	}
 
-	return metadata, store.StoreFile(cachePath, metadata, resp.Body)
+	return metadata, store.StoreFile(ctx, cachePath, metadata, resp.Body)
 }
 
 func urlToCachePath(url string) string {

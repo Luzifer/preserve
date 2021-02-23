@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -101,7 +102,7 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 
 	logger.Debug("Received request")
 
-	metadata, err := store.LoadMeta(cachePath)
+	metadata, err := store.LoadMeta(r.Context(), cachePath)
 	if err != nil && !os.IsNotExist(err) {
 		log.WithError(err).Error("Unable to load meta")
 		http.Error(w, "Unable to access entry metadata", http.StatusInternalServerError)
@@ -112,7 +113,8 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 		logger.Debug("Updating cache")
 		cacheHeader = "MISS"
 
-		metadata, err = renewCache(uri)
+		// Using background context to cache the file even in case of the request being aborted
+		metadata, err = renewCache(context.Background(), uri)
 		if err != nil {
 			logger.WithError(err).Warn("Unable to refresh file")
 		}
@@ -127,7 +129,7 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 	w.Header().Set("X-Last-Cached", metadata.LastCached.UTC().Format(http.TimeFormat))
 	w.Header().Set("X-Cache", cacheHeader)
 
-	f, err := store.GetFile(cachePath)
+	f, err := store.GetFile(r.Context(), cachePath)
 	if err != nil {
 		log.WithError(err).Error("Unable to load cached file")
 		http.Error(w, "Unable to access cache entry", http.StatusInternalServerError)

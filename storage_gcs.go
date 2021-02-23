@@ -53,11 +53,11 @@ func newStorageGCS(bucketURI string) (*storageGCS, error) {
 	}, nil
 }
 
-func (s storageGCS) GetFile(cachePath string) (io.ReadSeekCloser, error) {
+func (s storageGCS) GetFile(ctx context.Context, cachePath string) (io.ReadSeekCloser, error) {
 	cachePath = strings.TrimLeft(path.Join(s.prefix, cachePath), "/")
 	objHdl := s.client.Bucket(s.bucket).Object(cachePath)
 
-	r, err := objHdl.NewReader(context.Background())
+	r, err := objHdl.NewReader(ctx)
 	switch err {
 	case nil:
 		// This is fine
@@ -78,11 +78,11 @@ func (s storageGCS) GetFile(cachePath string) (io.ReadSeekCloser, error) {
 	return nopSeekCloser{bytes.NewReader(cache.Bytes())}, nil
 }
 
-func (s storageGCS) LoadMeta(cachePath string) (*meta, error) {
+func (s storageGCS) LoadMeta(ctx context.Context, cachePath string) (*meta, error) {
 	cachePath = strings.TrimLeft(path.Join(s.prefix, cachePath), "/")
 	objHdl := s.client.Bucket(s.bucket).Object(cachePath)
 
-	attrs, err := objHdl.Attrs(context.Background())
+	attrs, err := objHdl.Attrs(ctx)
 	switch err {
 	case nil:
 		// This is fine
@@ -109,11 +109,11 @@ func (s storageGCS) LoadMeta(cachePath string) (*meta, error) {
 	return out, nil
 }
 
-func (s storageGCS) StoreFile(cachePath string, metadata *meta, data io.Reader) error {
+func (s storageGCS) StoreFile(ctx context.Context, cachePath string, metadata *meta, data io.Reader) error {
 	cachePath = strings.TrimLeft(path.Join(s.prefix, cachePath), "/")
 	objHdl := s.client.Bucket(s.bucket).Object(cachePath)
 
-	w := objHdl.NewWriter(context.Background())
+	w := objHdl.NewWriter(ctx)
 	w.ObjectAttrs.ContentType = metadata.ContentType
 	w.ObjectAttrs.Metadata = map[string]string{
 		gcsMetaLastCached:   metadata.LastCached.Format(time.RFC3339Nano),

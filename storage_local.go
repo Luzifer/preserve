@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"os"
@@ -17,12 +18,12 @@ type storageLocal struct {
 
 func newStorageLocal(basePath string) storageLocal { return storageLocal{basePath} }
 
-func (s storageLocal) GetFile(cachePath string) (io.ReadSeekCloser, error) {
+func (s storageLocal) GetFile(ctx context.Context, cachePath string) (io.ReadSeekCloser, error) {
 	cachePath = path.Join(s.basePath, cachePath)
 	return os.Open(cachePath)
 }
 
-func (s storageLocal) LoadMeta(cachePath string) (*meta, error) {
+func (s storageLocal) LoadMeta(ctx context.Context, cachePath string) (*meta, error) {
 	cachePath = path.Join(s.basePath, cachePath)
 
 	metaPath := strings.Join([]string{cachePath, "meta"}, ".")
@@ -43,7 +44,7 @@ func (s storageLocal) LoadMeta(cachePath string) (*meta, error) {
 	)
 }
 
-func (s storageLocal) StoreFile(cachePath string, metadata *meta, data io.Reader) (err error) {
+func (s storageLocal) StoreFile(ctx context.Context, cachePath string, metadata *meta, data io.Reader) (err error) {
 	cachePath = path.Join(s.basePath, cachePath)
 
 	if err = os.MkdirAll(path.Dir(cachePath), 0700); err != nil {

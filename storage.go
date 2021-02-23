@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"io"
 	"time"
 )
@@ -12,7 +13,7 @@ type meta struct {
 }
 
 type storage interface {
-	GetFile(cachePath string) (io.ReadSeekCloser, error)
-	LoadMeta(cachePath string) (*meta, error)
-	StoreFile(cachePath string, metadata *meta, data io.Reader) error
+	GetFile(ctx context.Context, cachePath string) (io.ReadSeekCloser, error)
+	LoadMeta(ctx context.Context, cachePath string) (*meta, error)
+	StoreFile(ctx context.Context, cachePath string, metadata *meta, data io.Reader) error
 }
