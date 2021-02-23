@@ -23,3 +23,22 @@ This also works with parameters:
 
 `http://localhost:3000/https://pbs.twimg.com/media/somemediaid?format=jpg&name=4096x4096`
 
+### Select Storage Provider
+
+**Local files**
+
+```console
+preserve \
+  --listen=:3000 \
+  --storage-provider=local \
+  --storage-dir=/var/lib/preserve
+```
+
+**Google Cloud Storage**
+
+```console
+preserve \
+  --listen=:3000 \
+  --storage-provider=gcs \
+  --bucket-uri=gs://mybucket/prefix
+```
