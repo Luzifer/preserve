@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
+	httpHelpers "github.com/Luzifer/go_helpers/v2/http"
 	"github.com/Luzifer/rconfig/v2"
 )
 
@@ -58,7 +59,7 @@ func main() {
 
 	case "list":
 		// Special "provider" to list possible providers
-		fmt.Println("Available Storage Providers: local")
+		fmt.Println("Available Storage Providers: gcs, local")
 		return
 
 	case "local":
@@ -73,6 +74,9 @@ func main() {
 	r.PathPrefix("/").HandlerFunc(handleCacheOnce)
 
 	r.SkipClean(true)
+
+	r.Use(httpHelpers.NewHTTPLogHandler)
+	r.Use(httpHelpers.GzipHandler)
 
 	http.ListenAndServe(cfg.Listen, r)
 }
