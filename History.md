@@ -1,3 +1,8 @@
+# 0.3.1 / 2021-11-05
+
+  * Lint: Fix linter issues
+  * Add PR linting / auto-publishing
+
 # 0.3.0 / 2021-11-05
 
   * Handle base64 encoded URIs
