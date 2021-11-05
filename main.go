@@ -91,15 +91,6 @@ func handleCacheOnce(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool) {
-	var (
-		cachePath   = urlToCachePath(uri)
-		cacheHeader = "HIT"
-		logger      = log.WithFields(log.Fields{
-			"url":  uri,
-			"path": cachePath,
-		})
-	)
-
 	if strings.HasPrefix(uri, "b64:") {
 		u, err := base64.URLEncoding.DecodeString(strings.TrimPrefix(uri, "b64:"))
 		if err != nil {
@@ -108,6 +99,15 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 		}
 		uri = string(u)
 	}
+
+	var (
+		cachePath   = urlToCachePath(uri)
+		cacheHeader = "HIT"
+		logger      = log.WithFields(log.Fields{
+			"url":  uri,
+			"path": cachePath,
+		})
+	)
 
 	if u, err := url.Parse(uri); err != nil || u.Scheme == "" {
 		http.Error(w, "Unable to parse requested URL", http.StatusBadRequest)
