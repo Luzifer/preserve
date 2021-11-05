@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -98,6 +99,15 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 			"path": cachePath,
 		})
 	)
+
+	if strings.HasPrefix(uri, "b64:") {
+		u, err := base64.URLEncoding.DecodeString(strings.TrimPrefix(uri, "b64:"))
+		if err != nil {
+			http.Error(w, "Unable to decode base64 URL", http.StatusBadRequest)
+			return
+		}
+		uri = string(u)
+	}
 
 	if u, err := url.Parse(uri); err != nil || u.Scheme == "" {
 		http.Error(w, "Unable to parse requested URL", http.StatusBadRequest)
