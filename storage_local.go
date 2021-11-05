@@ -12,6 +12,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const storageLocalDirPermission = 0o700
+
 type storageLocal struct {
 	basePath string
 }
@@ -47,7 +49,7 @@ func (s storageLocal) LoadMeta(ctx context.Context, cachePath string) (*meta, er
 func (s storageLocal) StoreFile(ctx context.Context, cachePath string, metadata *meta, data io.Reader) (err error) {
 	cachePath = path.Join(s.basePath, cachePath)
 
-	if err = os.MkdirAll(path.Dir(cachePath), 0700); err != nil {
+	if err = os.MkdirAll(path.Dir(cachePath), storageLocalDirPermission); err != nil {
 		return errors.Wrap(err, "create cache dir")
 	}
 

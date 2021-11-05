@@ -11,10 +11,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+const lastSuccessStatus = 299
+
 func renewCache(ctx context.Context, url string) (*meta, error) {
 	cachePath := urlToCachePath(url)
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to create request")
 	}
@@ -29,7 +31,7 @@ func renewCache(ctx context.Context, url string) (*meta, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode > 299 {
+	if resp.StatusCode > lastSuccessStatus {
 		return nil, errors.Errorf("HTTP status signaled failure: %d", resp.StatusCode)
 	}
 
