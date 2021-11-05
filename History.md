@@ -1,3 +1,7 @@
+# 0.3.0 / 2021-11-05
+
+  * Handle base64 encoded URIs
+
 # 0.2.0 / 2021-06-09
 
   * Add HTTP log and Gzip compression for transit
