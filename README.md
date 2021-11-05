@@ -23,6 +23,10 @@ This also works with parameters:
 
 `http://localhost:3000/https://pbs.twimg.com/media/somemediaid?format=jpg&name=4096x4096`
 
+If you do have some service (like Discord) screwing up these URLs you can apply base64 URL-Encoding to them (do NOT omit the padding):
+
+`http://localhost:3000/b64:aHR0cHM6Ly9wYnMudHdpbWcuY29tL21lZGlhL3NvbWVtZWRpYWlkP2Zvcm1hdD1qcGcmbmFtZT00MDk2eDQwOTY=`
+
 ### Select Storage Provider
 
 **Local files**
