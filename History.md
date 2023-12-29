@@ -1,3 +1,8 @@
+# 0.3.2 / 2023-12-29
+
+  * Modernize code, update dependencies
+  * [CI] Replace deprecated CI tooling
+
 # 0.3.1 / 2021-11-05
 
   * Lint: Fix linter issues
