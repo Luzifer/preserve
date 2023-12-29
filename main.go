@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"net/url"
 	"os"
@@ -137,13 +139,13 @@ func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool
 	logger.Debug("Received request")
 
 	metadata, err := store.LoadMeta(r.Context(), cachePath)
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
 		logrus.WithError(err).Error("loading meta")
 		http.Error(w, "accessing entry metadata", http.StatusInternalServerError)
 		return
 	}
 
-	if update || os.IsNotExist(err) {
+	if update || errors.Is(err, fs.ErrNotExist) {
 		logger.Debug("updating cache")
 		cacheHeader = "MISS"
 
