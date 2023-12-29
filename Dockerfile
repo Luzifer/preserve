@@ -4,10 +4,13 @@ COPY . /go/src/github.com/Luzifer/preserve
 WORKDIR /go/src/github.com/Luzifer/preserve
 
 RUN set -ex \
- && apk add --update git \
+ && apk add --no-cache \
+      git \
  && go install \
-      -ldflags "-X main.version=$(git describe --tags --always || echo dev)" \
-      -mod=readonly
+      -ldflags "-s -w -X main.version=$(git describe --tags --always || echo dev)" \
+      -mod=readonly \
+      -trimpath
+
 
 FROM alpine:latest
 
@@ -23,6 +26,8 @@ COPY --from=builder /go/bin/preserve /usr/local/bin/preserve
 
 EXPOSE 3000
 VOLUME ["/data"]
+
+USER 1000
 
 ENTRYPOINT ["/usr/local/bin/preserve"]
 CMD ["--"]
