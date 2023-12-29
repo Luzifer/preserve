@@ -8,12 +8,14 @@ import (
 	"path"
 	"time"
 
+	"github.com/Luzifer/preserve/pkg/storage"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 const lastSuccessStatus = 299
 
-func renewCache(ctx context.Context, url string) (*meta, error) {
+func renewCache(ctx context.Context, url string) (*storage.Meta, error) {
 	cachePath := urlToCachePath(url)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -29,7 +31,11 @@ func renewCache(ctx context.Context, url string) (*meta, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to fetch source file")
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			logrus.WithError(err).Error("closing response body (leaked fd)")
+		}
+	}()
 
 	if resp.StatusCode > lastSuccessStatus {
 		return nil, errors.Errorf("HTTP status signaled failure: %d", resp.StatusCode)
@@ -40,13 +46,17 @@ func renewCache(ctx context.Context, url string) (*meta, error) {
 		lm = t
 	}
 
-	metadata := &meta{
+	metadata := &storage.Meta{
 		ContentType:  resp.Header.Get("Content-Type"),
 		LastCached:   time.Now(),
 		LastModified: lm,
 	}
 
-	return metadata, store.StoreFile(ctx, cachePath, metadata, resp.Body)
+	if err := store.StoreFile(ctx, cachePath, metadata, resp.Body); err != nil {
+		return nil, fmt.Errorf("storing file: %w", err)
+	}
+
+	return metadata, nil
 }
 
 func urlToCachePath(url string) string {

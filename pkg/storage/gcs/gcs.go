@@ -1,4 +1,5 @@
-package main
+// Package gcs implements a storage backend saving files in GCS
+package gcs
 
 import (
 	"bytes"
@@ -11,7 +12,9 @@ import (
 	"time"
 
 	gcs "cloud.google.com/go/storage"
+	"github.com/Luzifer/preserve/pkg/storage"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -25,13 +28,15 @@ type nopSeekCloser struct {
 
 func (nopSeekCloser) Close() error { return nil }
 
-type storageGCS struct {
+// Storage implements the storage.Storage interface for GCS storage
+type Storage struct {
 	bucket string
 	client *gcs.Client
 	prefix string
 }
 
-func newStorageGCS(bucketURI string) (*storageGCS, error) {
+// New returns a new GCS storage backend
+func New(bucketURI string) (*Storage, error) {
 	uri, err := url.Parse(bucketURI)
 	if err != nil {
 		return nil, errors.Wrap(err, "parse GCS bucket URI")
@@ -46,14 +51,15 @@ func newStorageGCS(bucketURI string) (*storageGCS, error) {
 		return nil, errors.Wrap(err, "create GCS client")
 	}
 
-	return &storageGCS{
+	return &Storage{
 		bucket: uri.Host,
 		client: client,
 		prefix: strings.TrimLeft(uri.Path, "/"),
 	}, nil
 }
 
-func (s storageGCS) GetFile(ctx context.Context, cachePath string) (io.ReadSeekCloser, error) {
+// GetFile implements the storage.Storage GetFile method
+func (s Storage) GetFile(ctx context.Context, cachePath string) (io.ReadSeekCloser, error) {
 	cachePath = strings.TrimLeft(path.Join(s.prefix, cachePath), "/")
 	objHdl := s.client.Bucket(s.bucket).Object(cachePath)
 
@@ -68,7 +74,11 @@ func (s storageGCS) GetFile(ctx context.Context, cachePath string) (io.ReadSeekC
 	default:
 		return nil, errors.Wrap(err, "get object reader")
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			logrus.WithError(err).Error("closing object reeader (leaked fd)")
+		}
+	}()
 
 	cache := new(bytes.Buffer)
 	if _, err = io.Copy(cache, r); err != nil {
@@ -78,7 +88,8 @@ func (s storageGCS) GetFile(ctx context.Context, cachePath string) (io.ReadSeekC
 	return nopSeekCloser{bytes.NewReader(cache.Bytes())}, nil
 }
 
-func (s storageGCS) LoadMeta(ctx context.Context, cachePath string) (*meta, error) {
+// LoadMeta implements the storage.Storage LoadMeta method
+func (s Storage) LoadMeta(ctx context.Context, cachePath string) (*storage.Meta, error) {
 	cachePath = strings.TrimLeft(path.Join(s.prefix, cachePath), "/")
 	objHdl := s.client.Bucket(s.bucket).Object(cachePath)
 
@@ -94,7 +105,7 @@ func (s storageGCS) LoadMeta(ctx context.Context, cachePath string) (*meta, erro
 		return nil, errors.Wrap(err, "get object meta")
 	}
 
-	out := &meta{
+	out := &storage.Meta{
 		ContentType: attrs.ContentType,
 	}
 
@@ -109,7 +120,8 @@ func (s storageGCS) LoadMeta(ctx context.Context, cachePath string) (*meta, erro
 	return out, nil
 }
 
-func (s storageGCS) StoreFile(ctx context.Context, cachePath string, metadata *meta, data io.Reader) error {
+// StoreFile implements the storage.Storage StoreFile method
+func (s Storage) StoreFile(ctx context.Context, cachePath string, metadata *storage.Meta, data io.Reader) error {
 	cachePath = strings.TrimLeft(path.Join(s.prefix, cachePath), "/")
 	objHdl := s.client.Bucket(s.bucket).Object(cachePath)
 
