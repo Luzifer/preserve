@@ -1,3 +1,7 @@
+# 0.3.4 / 2024-03-14
+
+  * Update dependencies
+
 # 0.3.3 / 2023-12-29
 
   * Fix: Error wrapping broke error check
