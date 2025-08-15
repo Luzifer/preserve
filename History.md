@@ -1,3 +1,9 @@
+# 0.3.7 / 2025-08-15
+
+  * fix(deps): update module github.com/luzifer/rconfig/v2 to v2.6.0
+  * chore(deps): update dependency go to v1.25.0
+  * chore: update Go dependencies
+
 # 0.3.6 / 2024-12-12
 
   * Update Go dependencies
