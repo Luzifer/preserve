@@ -1,7 +1,7 @@
-FROM golang:alpine as builder
+FROM golang:1.25-alpine AS builder
 
-COPY . /go/src/github.com/Luzifer/preserve
-WORKDIR /go/src/github.com/Luzifer/preserve
+COPY . /src/preserve
+WORKDIR /src/preserve
 
 RUN set -ex \
  && apk add --no-cache \
@@ -12,9 +12,9 @@ RUN set -ex \
       -trimpath
 
 
-FROM alpine:latest
+FROM alpine:3.22
 
-LABEL maintainer "Knut Ahlers <knut@ahlers.me>"
+LABEL maintainer="Knut Ahlers <knut@ahlers.me>"
 
 ENV STORAGE_DIR=/data
 
