@@ -1,4 +1,4 @@
-FROM golang:1.25-alpine AS builder
+FROM golang:1.25-alpine@sha256:77dd832edf2752dafd030693bef196abb24dcba3a2bc3d7a6227a7a1dae73169 AS builder
 
 COPY . /src/preserve
 WORKDIR /src/preserve
@@ -12,7 +12,7 @@ RUN set -ex \
       -trimpath
 
 
-FROM alpine:3.22
+FROM alpine:3.22@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
 
 LABEL maintainer="Knut Ahlers <knut@ahlers.me>"
 

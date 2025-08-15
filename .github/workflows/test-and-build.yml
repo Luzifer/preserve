@@ -16,7 +16,7 @@ jobs:
         shell: bash
 
     container:
-      image: ghcr.io/luzifer-docker/action-env:master
+      image: ghcr.io/luzifer-docker/action-env:master@sha256:0fdffa33bbadd720cc28cb0b2aa322ec0f3441a1f098f4bd4444f161e7d588e5
       env:
         CGO_ENABLED: 0
 
@@ -54,7 +54,7 @@ jobs:
         run: 'awk "/^#/ && ++c==2{exit}; /^#/f" "History.md" | tail -n +2 >release_changelog.md'
 
       - name: Release
-        uses: ncipollo/release-action@v1.18.0
+        uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af # v1.18.0
         if: startsWith(github.ref, 'refs/tags/')
         with:
           artifacts: '.build/*'
