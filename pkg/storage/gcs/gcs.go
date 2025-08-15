@@ -126,8 +126,8 @@ func (s Storage) StoreFile(ctx context.Context, cachePath string, metadata *stor
 	objHdl := s.client.Bucket(s.bucket).Object(cachePath)
 
 	w := objHdl.NewWriter(ctx)
-	w.ObjectAttrs.ContentType = metadata.ContentType
-	w.ObjectAttrs.Metadata = map[string]string{
+	w.ContentType = metadata.ContentType
+	w.Metadata = map[string]string{
 		gcsMetaLastCached:   metadata.LastCached.Format(time.RFC3339Nano),
 		gcsMetaLastModified: metadata.LastModified.Format(time.RFC3339Nano),
 	}
