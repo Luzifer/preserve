@@ -2,7 +2,7 @@ module github.com/Luzifer/preserve
 
 go 1.23.8
 
-toolchain go1.25.0
+toolchain go1.25.1
 
 require (
 	cloud.google.com/go/storage v1.56.1
