@@ -6,7 +6,7 @@ toolchain go1.25.7
 
 require (
 	cloud.google.com/go/storage v1.59.2
-	github.com/Luzifer/go_helpers/v2 v2.25.0
+	github.com/Luzifer/go_helpers/v2 v2.25.2
 	github.com/Luzifer/rconfig/v2 v2.6.1
 	github.com/gorilla/mux v1.8.1
 	github.com/pkg/errors v0.9.1
