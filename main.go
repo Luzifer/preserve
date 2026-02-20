@@ -15,7 +15,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 
-	httpHelpers "github.com/Luzifer/go_helpers/v2/http"
+	httpHelpers "github.com/Luzifer/go_helpers/http"
 	"github.com/Luzifer/preserve/pkg/storage"
 	"github.com/Luzifer/preserve/pkg/storage/gcs"
 	"github.com/Luzifer/preserve/pkg/storage/local"

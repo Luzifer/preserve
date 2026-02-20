@@ -1,12 +1,12 @@
 module github.com/Luzifer/preserve
 
-go 1.24.0
+go 1.25.7
 
 toolchain go1.26.0
 
 require (
 	cloud.google.com/go/storage v1.60.0
-	github.com/Luzifer/go_helpers/v2 v2.25.2
+	github.com/Luzifer/go_helpers/http v0.12.2
 	github.com/Luzifer/rconfig/v2 v2.6.1
 	github.com/gorilla/mux v1.8.1
 	github.com/pkg/errors v0.9.1
@@ -24,6 +24,8 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.30.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.55.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.55.0 // indirect
+	github.com/Luzifer/go_helpers/accesslogger v0.1.1 // indirect
+	github.com/Luzifer/go_helpers/str v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20251022180443-0feb69152e9f // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.35.0 // indirect
