@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Luzifer/preserve/pkg/storage"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/Luzifer/preserve/pkg/storage"
 )
 
 const storageLocalDirPermission = 0o700
@@ -48,7 +48,7 @@ func (s Storage) LoadMeta(_ context.Context, cachePath string) (*storage.Meta, e
 
 	f, err := os.Open(metaPath) //#nosec:G304 // Safe source of variable
 	if err != nil {
-		return nil, errors.Wrap(err, "open metadata file")
+		return nil, fmt.Errorf("open metadata file: %w", err)
 	}
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -57,10 +57,11 @@ func (s Storage) LoadMeta(_ context.Context, cachePath string) (*storage.Meta, e
 	}()
 
 	out := new(storage.Meta)
-	return out, errors.Wrap(
-		json.NewDecoder(f).Decode(out),
-		"decode metadata file",
-	)
+	if err = json.NewDecoder(f).Decode(out); err != nil {
+		return nil, fmt.Errorf("decode metadata file: %w", err)
+	}
+
+	return out, nil
 }
 
 // StoreFile implements the storage.Storage StoreFile method
@@ -68,12 +69,12 @@ func (s Storage) StoreFile(_ context.Context, cachePath string, metadata *storag
 	cachePath = path.Join(s.basePath, cachePath)
 
 	if err = os.MkdirAll(path.Dir(cachePath), storageLocalDirPermission); err != nil {
-		return errors.Wrap(err, "create cache dir")
+		return fmt.Errorf("create cache dir: %w", err)
 	}
 
 	f, err := os.Create(cachePath) //#nosec:G304 // Safe source of variable
 	if err != nil {
-		return errors.Wrap(err, "create cache file")
+		return fmt.Errorf("create cache file: %w", err)
 	}
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -82,12 +83,12 @@ func (s Storage) StoreFile(_ context.Context, cachePath string, metadata *storag
 	}()
 
 	if _, err := io.Copy(f, data); err != nil {
-		return errors.Wrap(err, "write cache file")
+		return fmt.Errorf("write cache file: %w", err)
 	}
 
 	f, err = os.Create(strings.Join([]string{cachePath, "meta"}, "."))
 	if err != nil {
-		return errors.Wrap(err, "create cache meta file")
+		return fmt.Errorf("create cache meta file: %w", err)
 	}
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -97,8 +98,9 @@ func (s Storage) StoreFile(_ context.Context, cachePath string, metadata *storag
 
 	metadata.LastCached = time.Now()
 
-	return errors.Wrap(
-		json.NewEncoder(f).Encode(metadata),
-		"write cache meta file",
-	)
+	if err = json.NewEncoder(f).Encode(metadata); err != nil {
+		return fmt.Errorf("write cache meta file: %w", err)
+	}
+
+	return nil
 }

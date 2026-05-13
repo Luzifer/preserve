@@ -1,6 +1,6 @@
 module github.com/Luzifer/preserve
 
-go 1.25.7
+go 1.26.0
 
 toolchain go1.26.2
 
@@ -9,7 +9,6 @@ require (
 	github.com/Luzifer/go_helpers/http v0.12.4
 	github.com/Luzifer/rconfig/v2 v2.6.1
 	github.com/gorilla/mux v1.8.1
-	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.4
 )
 

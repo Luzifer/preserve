@@ -1,3 +1,4 @@
+// Preserve the Internet
 package main
 
 import (
@@ -12,14 +13,14 @@ import (
 	"strings"
 	"time"
 
+	httphelpers "github.com/Luzifer/go_helpers/http"
+	"github.com/Luzifer/rconfig/v2"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 
-	httpHelpers "github.com/Luzifer/go_helpers/http"
 	"github.com/Luzifer/preserve/pkg/storage"
 	"github.com/Luzifer/preserve/pkg/storage/gcs"
 	"github.com/Luzifer/preserve/pkg/storage/local"
-	"github.com/Luzifer/rconfig/v2"
 )
 
 var (
@@ -88,8 +89,8 @@ func main() {
 
 	r.SkipClean(true)
 
-	r.Use(httpHelpers.NewHTTPLogHandler)
-	r.Use(httpHelpers.GzipHandler)
+	r.Use(httphelpers.NewHTTPLogHandler)
+	r.Use(httphelpers.GzipHandler)
 
 	server := http.Server{
 		Addr:              cfg.Listen,
@@ -113,8 +114,8 @@ func handleCacheOnce(w http.ResponseWriter, r *http.Request) {
 
 //revive:disable-next-line:flag-parameter // This is fine in this case
 func handleCache(w http.ResponseWriter, r *http.Request, uri string, update bool) {
-	if strings.HasPrefix(uri, "b64:") {
-		u, err := base64.URLEncoding.DecodeString(strings.TrimPrefix(uri, "b64:"))
+	if after, ok := strings.CutPrefix(uri, "b64:"); ok {
+		u, err := base64.URLEncoding.DecodeString(after)
 		if err != nil {
 			http.Error(w, "decoding base64 URL", http.StatusBadRequest)
 			return

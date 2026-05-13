@@ -8,9 +8,9 @@ import (
 	"path"
 	"time"
 
-	"github.com/Luzifer/preserve/pkg/storage"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/Luzifer/preserve/pkg/storage"
 )
 
 const lastSuccessStatus = 299
@@ -20,7 +20,7 @@ func renewCache(ctx context.Context, url string) (*storage.Meta, error) {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to create request")
+		return nil, fmt.Errorf("creating request: %w", err)
 	}
 
 	if cfg.UserAgent != "" {
@@ -29,7 +29,7 @@ func renewCache(ctx context.Context, url string) (*storage.Meta, error) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to fetch source file")
+		return nil, fmt.Errorf("fetching source file: %w", err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
@@ -38,7 +38,7 @@ func renewCache(ctx context.Context, url string) (*storage.Meta, error) {
 	}()
 
 	if resp.StatusCode > lastSuccessStatus {
-		return nil, errors.Errorf("HTTP status signaled failure: %d", resp.StatusCode)
+		return nil, fmt.Errorf("HTTP status signaled failure: %d", resp.StatusCode)
 	}
 
 	lm := time.Now()

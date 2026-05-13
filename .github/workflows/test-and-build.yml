@@ -1,6 +1,5 @@
----
-
 name: test-and-build
+
 on:
   push:
     branches: ['*']
@@ -61,5 +60,3 @@ jobs:
           bodyFile: release_changelog.md
           draft: false
           generateReleaseNotes: false
-
-...

@@ -4,6 +4,8 @@ package gcs
 import (
 	"bytes"
 	"context"
+	"errors"
+	"fmt"
 	"io"
 	"net/url"
 	"os"
@@ -12,9 +14,9 @@ import (
 	"time"
 
 	gcs "cloud.google.com/go/storage"
-	"github.com/Luzifer/preserve/pkg/storage"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/Luzifer/preserve/pkg/storage"
 )
 
 const (
@@ -22,24 +24,26 @@ const (
 	gcsMetaLastModified = "x-preserve-last-modified"
 )
 
-type nopSeekCloser struct {
-	io.ReadSeeker
-}
+// Storage implements the storage.Storage interface for GCS storage
+type (
+	Storage struct {
+		bucket string
+		client *gcs.Client
+		prefix string
+	}
+
+	nopSeekCloser struct {
+		io.ReadSeeker
+	}
+)
 
 func (nopSeekCloser) Close() error { return nil }
-
-// Storage implements the storage.Storage interface for GCS storage
-type Storage struct {
-	bucket string
-	client *gcs.Client
-	prefix string
-}
 
 // New returns a new GCS storage backend
 func New(bucketURI string) (*Storage, error) {
 	uri, err := url.Parse(bucketURI)
 	if err != nil {
-		return nil, errors.Wrap(err, "parse GCS bucket URI")
+		return nil, fmt.Errorf("parse GCS bucket URI: %w", err)
 	}
 
 	if uri.Scheme != "gs" || uri.Host == "" {
@@ -48,7 +52,7 @@ func New(bucketURI string) (*Storage, error) {
 
 	client, err := gcs.NewClient(context.Background())
 	if err != nil {
-		return nil, errors.Wrap(err, "create GCS client")
+		return nil, fmt.Errorf("create GCS client: %w", err)
 	}
 
 	return &Storage{
@@ -72,7 +76,7 @@ func (s Storage) GetFile(ctx context.Context, cachePath string) (io.ReadSeekClos
 		return nil, os.ErrNotExist
 
 	default:
-		return nil, errors.Wrap(err, "get object reader")
+		return nil, fmt.Errorf("get object reader: %w", err)
 	}
 	defer func() {
 		if err := r.Close(); err != nil {
@@ -82,7 +86,7 @@ func (s Storage) GetFile(ctx context.Context, cachePath string) (io.ReadSeekClos
 
 	cache := new(bytes.Buffer)
 	if _, err = io.Copy(cache, r); err != nil {
-		return nil, errors.Wrap(err, "cache object in memory")
+		return nil, fmt.Errorf("cache object in memory: %w", err)
 	}
 
 	return nopSeekCloser{bytes.NewReader(cache.Bytes())}, nil
@@ -102,7 +106,7 @@ func (s Storage) LoadMeta(ctx context.Context, cachePath string) (*storage.Meta,
 		return nil, os.ErrNotExist // Surrounding code reacts on ErrNotExist
 
 	default:
-		return nil, errors.Wrap(err, "get object meta")
+		return nil, fmt.Errorf("get object meta: %w", err)
 	}
 
 	out := &storage.Meta{
@@ -110,18 +114,18 @@ func (s Storage) LoadMeta(ctx context.Context, cachePath string) (*storage.Meta,
 	}
 
 	if out.LastCached, err = time.Parse(time.RFC3339Nano, attrs.Metadata[gcsMetaLastCached]); err != nil {
-		return nil, errors.Wrap(err, "parse last-cached date")
+		return nil, fmt.Errorf("parse last-cached date: %w", err)
 	}
 
 	if out.LastModified, err = time.Parse(time.RFC3339Nano, attrs.Metadata[gcsMetaLastModified]); err != nil {
-		return nil, errors.Wrap(err, "parse last-modified date")
+		return nil, fmt.Errorf("parse last-modified date: %w", err)
 	}
 
 	return out, nil
 }
 
 // StoreFile implements the storage.Storage StoreFile method
-func (s Storage) StoreFile(ctx context.Context, cachePath string, metadata *storage.Meta, data io.Reader) error {
+func (s Storage) StoreFile(ctx context.Context, cachePath string, metadata *storage.Meta, data io.Reader) (err error) {
 	cachePath = strings.TrimLeft(path.Join(s.prefix, cachePath), "/")
 	objHdl := s.client.Bucket(s.bucket).Object(cachePath)
 
@@ -133,8 +137,12 @@ func (s Storage) StoreFile(ctx context.Context, cachePath string, metadata *stor
 	}
 
 	if _, err := io.Copy(w, data); err != nil {
-		return errors.Wrap(err, "upload content")
+		return fmt.Errorf("upload content: %w", err)
 	}
 
-	return errors.Wrap(w.Close(), "finish upload")
+	if err = w.Close(); err != nil {
+		return fmt.Errorf("finish upload: %w", err)
+	}
+
+	return nil
 }
