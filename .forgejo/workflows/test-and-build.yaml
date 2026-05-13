@@ -1,0 +1,43 @@
+name: test-and-build
+
+on:
+  push: {}
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    defaults:
+      run:
+        shell: bash
+
+    container:
+      image: ghcr.io/luzifer-docker/action-env:master@sha256:50527a8f320781de7106e753fe6667f47a01d79e6e79766df45d68981dcc8711
+      env:
+        CGO_ENABLED: 0
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Marking workdir safe
+        run: git config --global --add safe.directory /__w/preserve/preserve
+
+      - name: Lint and test code
+        run: make lint test
+
+      - name: Execute Trivy scan
+        run: |
+          trivy fs . \
+            --dependency-tree \
+            --exit-code 1 \
+            --format table \
+            --ignore-unfixed \
+            --quiet \
+            --scanners misconfig,license,secret,vuln \
+            --severity HIGH,CRITICAL
+
+      - name: Local Build
+        run: go build .
