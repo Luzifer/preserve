@@ -32,8 +32,8 @@ github.com/Luzifer/go_helpers/accesslogger v0.1.1 h1:z9tg/Sd508g5OR1rG2kmzvM1zgg
 github.com/Luzifer/go_helpers/accesslogger v0.1.1/go.mod h1:x4K138iYEIhpVAjoxuXyTTzKiZLJEu4Lu8DX+zeDUzw=
 github.com/Luzifer/go_helpers/http v0.12.4 h1:x61Njbbpugq+fHZbloc5g5LtQ6pbOrIPeWdOqR1AnHA=
 github.com/Luzifer/go_helpers/http v0.12.4/go.mod h1:+oUm+JPQRjjockMjbKHqFNWj6dwY8iGnlYNUHE+NpdU=
-github.com/Luzifer/rconfig/v2 v2.6.1 h1:n8iAygRdri/yRqhOYtU80TcWyrzuEpeIhBmdseVtZo8=
-github.com/Luzifer/rconfig/v2 v2.6.1/go.mod h1:EmQawSlworIE4tMTHdSCHu1exXG8peNqj7tJtrYYleU=
+github.com/Luzifer/rconfig/v2 v2.6.2 h1:Dx9WetHvyUx84P8D7WDr7OvsEsD0XT3t04DtCSqT95o=
+github.com/Luzifer/rconfig/v2 v2.6.2/go.mod h1:F8bKJYwzwQT0m0V0N6S8uS7tI6jm05ANCe3D0EHuX/w=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cncf/xds/go v0.0.0-20260202195803-dba9d589def2 h1:aBangftG7EVZoUb69Os8IaYg++6uMOdKK83QtkkvJik=
