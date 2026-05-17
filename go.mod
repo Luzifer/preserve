@@ -6,7 +6,7 @@ toolchain go1.26.3
 
 require (
 	cloud.google.com/go/storage v1.62.1
-	github.com/Luzifer/go_helpers/http v0.12.4
+	github.com/Luzifer/go_helpers/http v0.12.5
 	github.com/Luzifer/rconfig/v2 v2.6.2
 	github.com/gorilla/mux v1.8.1
 	github.com/sirupsen/logrus v1.9.4
@@ -23,7 +23,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.32.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.56.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.56.0 // indirect
-	github.com/Luzifer/go_helpers/accesslogger v0.1.1 // indirect
+	github.com/Luzifer/go_helpers/accesslogger v0.1.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20260202195803-dba9d589def2 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.37.0 // indirect

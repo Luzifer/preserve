@@ -28,10 +28,10 @@ github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/cloudmock v0
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/cloudmock v0.56.0/go.mod h1:rqP9UEhOXv9WhQ7Gjz+G5y/pf8+BJZW5/Ts0AhE0PwE=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.56.0 h1:0YP0+/ixwu+Uqeu/FGiBZNQ19huiUxxiPXIc9WsLKuQ=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.56.0/go.mod h1:6ZZMQhZKDvUvkJw2rc+oDP90tMMzuU/J+5HG1ZmPOmE=
-github.com/Luzifer/go_helpers/accesslogger v0.1.1 h1:z9tg/Sd508g5OR1rG2kmzvM1zgg1JGyMYWuWWCvkPyA=
-github.com/Luzifer/go_helpers/accesslogger v0.1.1/go.mod h1:x4K138iYEIhpVAjoxuXyTTzKiZLJEu4Lu8DX+zeDUzw=
-github.com/Luzifer/go_helpers/http v0.12.4 h1:x61Njbbpugq+fHZbloc5g5LtQ6pbOrIPeWdOqR1AnHA=
-github.com/Luzifer/go_helpers/http v0.12.4/go.mod h1:+oUm+JPQRjjockMjbKHqFNWj6dwY8iGnlYNUHE+NpdU=
+github.com/Luzifer/go_helpers/accesslogger v0.1.2 h1:iDzSeFPrRIPmvWTERBkJuXIn2I9d64AVWT99Y8ZLJ28=
+github.com/Luzifer/go_helpers/accesslogger v0.1.2/go.mod h1:x4K138iYEIhpVAjoxuXyTTzKiZLJEu4Lu8DX+zeDUzw=
+github.com/Luzifer/go_helpers/http v0.12.5 h1:p4ZASYiiI6z5eTWzdW/5vq7502zI4psJl7Hv2XD2kaQ=
+github.com/Luzifer/go_helpers/http v0.12.5/go.mod h1:pydx7ol0KMRCRD3tth6DTLkjY/Lf+RByT48zgjbRmck=
 github.com/Luzifer/rconfig/v2 v2.6.2 h1:Dx9WetHvyUx84P8D7WDr7OvsEsD0XT3t04DtCSqT95o=
 github.com/Luzifer/rconfig/v2 v2.6.2/go.mod h1:F8bKJYwzwQT0m0V0N6S8uS7tI6jm05ANCe3D0EHuX/w=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
